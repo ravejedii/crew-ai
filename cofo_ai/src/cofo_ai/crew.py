@@ -1,9 +1,25 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
+import pandas as pd
+import os
+
 # If you want to run a snippet of code before or after the crew starts, 
 # you can use the @before_kickoff and @after_kickoff decorators
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+
+class AnalyzeSpreadsheetTool:
+	name = "analyze_spreadsheet"
+	description = "Tool to analyze data from an Excel file."
+
+	def func(self):
+		# Use an absolute path
+		file_path = os.path.abspath('../data/financials_info.xlsx')
+		data = pd.read_excel(file_path)
+
+		# Example: Process the data
+		# Perform analysis or extract data as needed
+		print(data.head())  # Print the first few rows for demonstration
 
 @CrewBase
 class CofoAi():
@@ -18,16 +34,17 @@ class CofoAi():
 	# If you would like to add tools to your agents, you can learn more about it here:
 	# https://docs.crewai.com/concepts/agents#agent-tools
 	@agent
-	def researcher(self) -> Agent:
+	def finance_analyst(self) -> Agent:
 		return Agent(
-			config=self.agents_config['researcher'],
-			verbose=True
+			config=self.agents_config['finance_analyst'],
+			verbose=True,
+			tools=[AnalyzeSpreadsheetTool()]  # Use the tool class
 		)
 
 	@agent
-	def reporting_analyst(self) -> Agent:
+	def finance_manager(self) -> Agent:
 		return Agent(
-			config=self.agents_config['reporting_analyst'],
+			config=self.agents_config['finance_manager'],
 			verbose=True
 		)
 
@@ -35,15 +52,15 @@ class CofoAi():
 	# task dependencies, and task callbacks, check out the documentation:
 	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
 	@task
-	def research_task(self) -> Task:
+	def analyze_excel_task(self) -> Task:
 		return Task(
-			config=self.tasks_config['research_task'],
+			config=self.tasks_config['analyze_excel_task'],
 		)
 
 	@task
-	def reporting_task(self) -> Task:
+	def financial_analysis_task(self) -> Task:
 		return Task(
-			config=self.tasks_config['reporting_task'],
+			config=self.tasks_config['financial_analysis_task'],
 			output_file='report.md'
 		)
 
