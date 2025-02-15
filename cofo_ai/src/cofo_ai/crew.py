@@ -13,13 +13,36 @@ class AnalyzeSpreadsheetTool:
 	description = "Tool to analyze data from an Excel file."
 
 	def func(self):
-		# Use an absolute path
-		file_path = os.path.abspath('../data/financials_info.xlsx')
-		data = pd.read_excel(file_path)
+		try:
+			# Use an absolute path
+			file_path = os.path.abspath('../data/financials_info.xlsx')
+			print(f"Current working directory: {os.getcwd()}")
+			print(f"Attempting to read Excel file at: {file_path}")
 
-		# Example: Process the data
-		# Perform analysis or extract data as needed
-		print(data.head())  # Print the first few rows for demonstration
+			# Check if file exists
+			if not os.path.exists(file_path):
+				print(f"Error: The file at {file_path} does not exist.")
+				return {"error": "File not found"}
+
+			data = pd.read_excel(file_path)
+
+			# Example: Process the data
+			print(data.head())  # Print the first few rows for demonstration
+
+			# Return a summary of the data
+			summary = {
+				"columns": list(data.columns),
+				"num_rows": len(data),
+				"sample_data": data.head().to_dict()
+			}
+			return summary
+
+		except FileNotFoundError:
+			print(f"Error: The file at {file_path} was not found.")
+			return {"error": "File not found"}
+		except Exception as e:
+			print(f"An error occurred: {e}")
+			return {"error": str(e)}
 
 @CrewBase
 class CofoAi():
@@ -77,3 +100,16 @@ class CofoAi():
 			verbose=True,
 			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
 		)
+
+# Standalone script to test reading the Excel file
+if __name__ == "__main__":
+	try:
+		file_path = os.path.abspath('../data/financials_info.xlsx')
+		print(f"Testing file read at: {file_path}")
+		if not os.path.exists(file_path):
+			print(f"Error: The file at {file_path} does not exist.")
+		else:
+			data = pd.read_excel(file_path)
+			print(data.head())
+	except Exception as e:
+		print(f"An error occurred while testing file read: {e}")
