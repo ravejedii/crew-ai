@@ -1,0 +1,24 @@
+[project]
+name = "cofo_ai"
+version = "0.1.0"
+description = "cofo_ai using crewAI"
+authors = [{ name = "Lucas Richards", email = "lucas.crawford.richards@gmail.com" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "crewai[tools]>=0.102.0,<1.0.0",
+    "onnxruntime==1.15.1"
+]
+
+[project.scripts]
+cofo_ai = "cofo_ai.main:run"
+run_crew = "cofo_ai.main:run"
+train = "cofo_ai.main:train"
+replay = "cofo_ai.main:replay"
+test = "cofo_ai.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
